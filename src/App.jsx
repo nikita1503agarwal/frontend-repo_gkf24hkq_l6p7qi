@@ -1,26 +1,54 @@
-import { useState } from 'react'
+import React, { Suspense, lazy } from 'react'
+import Header from './components/Header'
+import Hero from './components/Hero'
+import Footer from './components/Footer'
+import { SITE } from './data'
+
+const Skills = lazy(() => import('./components/Skills'))
+const Projects = lazy(() => import('./components/Projects'))
+const Services = lazy(() => import('./components/Services'))
+const Testimonials = lazy(() => import('./components/Testimonials'))
+const Contact = lazy(() => import('./components/Contact'))
+
+function SEO() {
+  // In SPA context, inject common SEO tags. For full SSR/Next.js, move to head.
+  React.useEffect(() => {
+    document.title = SITE.title
+    const setMeta = (name, content, attr = 'name') => {
+      let el = document.querySelector(`meta[${attr}='${name}']`)
+      if (!el) {
+        el = document.createElement('meta')
+        el.setAttribute(attr, name)
+        document.head.appendChild(el)
+      }
+      el.setAttribute('content', content)
+    }
+    setMeta('description', SITE.description)
+    setMeta('og:title', SITE.title, 'property')
+    setMeta('og:description', SITE.description, 'property')
+    setMeta('og:type', 'website', 'property')
+    setMeta('og:image', SITE.ogImage, 'property')
+    setMeta('twitter:card', 'summary_large_image')
+  }, [])
+  return null
+}
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 flex items-center justify-center">
-      <div className="bg-white p-8 rounded-lg shadow-lg">
-        <h1 className="text-3xl font-bold text-gray-800 mb-4">
-          Vibe Coding Platform
-        </h1>
-        <p className="text-gray-600 mb-6">
-          Your AI-powered development environment
-        </p>
-        <div className="text-center">
-          <button
-            onClick={() => setCount(count + 1)}
-            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded"
-          >
-            Count is {count}
-          </button>
-        </div>
-      </div>
+    <div className="min-h-screen bg-white dark:bg-black">
+      <SEO />
+      <Header />
+      <main className="pt-14">
+        <Hero />
+        <Suspense fallback={<section className="py-16 sm:py-24"/>}>
+          <Skills />
+          <Projects />
+          <Services />
+          <Testimonials />
+          <Contact />
+        </Suspense>
+      </main>
+      <Footer />
     </div>
   )
 }
